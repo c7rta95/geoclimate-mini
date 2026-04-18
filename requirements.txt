@@ -1,0 +1,9 @@
+numpy
+rasterio
+geopandas
+folium
+fpdf2
+streamlit
+pyproj
+affine
+requests

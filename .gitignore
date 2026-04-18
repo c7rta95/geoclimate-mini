@@ -1,0 +1,7 @@
+landsat_image.tar
+landsat_extract/
+LST_temp.tif
+__pycache__/
+*.pyc
+*.npy
+b10_brut.png
