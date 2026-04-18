@@ -1,5 +1,4 @@
 import streamlit as st
-import numpy as np
 import os
 
 # ── CONFIGURATION PAGE ───────────────────────────────────────
@@ -14,21 +13,12 @@ st.title("GeoClimate Mini")
 st.subheader("Analyse des ilots de chaleur urbains - Lyon, 19 aout 2023")
 st.markdown("---")
 
-# ── CHARGEMENT DES DONNEES ───────────────────────────────────
-@st.cache_data
-def charger_donnees():
-    LST = np.load("LST_lyon.npy")
-    return LST
-
-LST_lyon = charger_donnees()
-
-temp_min  = round(float(np.nanmin(LST_lyon)), 1)
-temp_max  = round(float(np.nanmax(LST_lyon)), 1)
-temp_moy  = round(float(np.nanmean(LST_lyon)), 1)
-seuil     = round(temp_moy + 5, 1)
-total     = int(np.sum(~np.isnan(LST_lyon)))
-ilots     = int(np.sum(LST_lyon > seuil))
-pct_ilots = round(ilots / total * 100, 1)
+# ── DONNEES EN DUR (calculees localement) ────────────────────
+temp_min  = 29.9
+temp_max  = 60.3
+temp_moy  = 45.8
+seuil     = 50.8
+pct_ilots = 4.4
 
 # ── INDICATEURS CLES ─────────────────────────────────────────
 st.header("Indicateurs cles")
@@ -50,7 +40,9 @@ col_carte1, col_carte2 = st.columns(2)
 with col_carte1:
     st.subheader("Temperature de surface complete")
     if os.path.exists("LST_lyon.png"):
-        st.image("LST_lyon.png", use_column_width=True)
+        st.image("LST_lyon.png", use_container_width=True)
+    else:
+        st.warning("LST_lyon.png non trouve")
 
 with col_carte2:
     st.subheader("Carte interactive Folium")
@@ -58,6 +50,8 @@ with col_carte2:
         with open("ilots_chaleur_lyon.html", "r", encoding="utf-8") as f:
             html_content = f.read()
         st.components.v1.html(html_content, height=500)
+    else:
+        st.warning("ilots_chaleur_lyon.html non trouve")
 
 st.markdown("---")
 
@@ -75,7 +69,7 @@ if os.path.exists("rapport_geoclimate_lyon.pdf"):
     )
     st.success("Rapport disponible au telechargement")
 else:
-    st.warning("Rapport PDF non trouve - lancez rapport_pdf.py d'abord")
+    st.warning("Rapport PDF non trouve")
 
 st.markdown("---")
 
@@ -113,4 +107,19 @@ with col_m3:
     """)
 
 st.markdown("---")
+
+# ── A PROPOS ─────────────────────────────────────────────────
+st.header("A propos")
+st.markdown("""
+**GeoClimate Mini** est une application beta demontrant la faisabilite d'une 
+analyse automatisee des ilots de chaleur urbains a partir de donnees satellite gratuites.
+
+**Stack technique :**
+Python - rasterio - GeoPandas - Folium - Ollama (LLM local) - Streamlit
+
+**Budget total du projet : moins de 20 euros**
+
+**Code source :** [github.com/c7rta95/geoclimate-mini](https://github.com/c7rta95/geoclimate-mini)
+""")
+
 st.caption("GeoClimate Mini - Beta v1.0 - Donnees : Landsat 9 / USGS - IA : Ollama llama3.2")
